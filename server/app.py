@@ -113,7 +113,7 @@ def process_download(download_id, url, filename):
         
         downloads[download_id]['status'] = 'complete'
         downloads[download_id]['progress'] = 'Download complete!'
-        downloads[download_id]['download_url'] = f"https://music-ripper.vercel.app/get-file/{download_id}"
+        downloads[download_id]['download_url'] = f"http://localhost:5000/get-file/{download_id}"
         
         def cleanup_after_delay():
             time.sleep(600)
@@ -187,3 +187,6 @@ def index():
             </body>
         </html>
     ''')
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
