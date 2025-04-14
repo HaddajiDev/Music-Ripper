@@ -1,0 +1,5 @@
+[phases.setup]
+nixPkgs = ["ffmpeg"]  # Install FFmpeg system-wide
+
+[phases.install]
+commands = ["pip install -r requirements.txt"]
