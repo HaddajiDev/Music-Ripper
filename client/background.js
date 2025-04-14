@@ -49,7 +49,7 @@ async function handleConversion(request, sendResponse) {
           active: true
       };
       
-      const response = await fetch('http://localhost:5000/download-with-progress', {
+      const response = await fetch('https://music-ripper.vercel.app/download-with-progress', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json'
@@ -88,7 +88,7 @@ async function pollProgress() {
   if (!currentDownloadInfo.id || !currentDownloadInfo.active) return;
 
   try {
-      const response = await fetch(`http://localhost:5000/progress/${currentDownloadInfo.id}`);
+      const response = await fetch(`https://music-ripper.vercel.app/progress/${currentDownloadInfo.id}`);
       const data = await response.json();
       
       if (response.ok) {
@@ -121,7 +121,7 @@ async function pollProgress() {
 
 async function checkForActiveDownloads() {
     try {
-        const response = await fetch('http://localhost:5000/active-downloads');
+        const response = await fetch('https://music-ripper.vercel.app/active-downloads');
         if (response.ok) {
             const data = await response.json();
             if (data.downloads && data.downloads.length > 0) {

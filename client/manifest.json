@@ -6,7 +6,7 @@
     "activeTab",
     "downloads",
     "*://*.youtube.com/*",
-    "http://localhost:5000/*",
+    "https://music-ripper.vercel.app/*",
     "storage"
   ],
   "browser_action": {
