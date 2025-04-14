@@ -1,0 +1,4 @@
+Flask
+werkzeug
+yt-dlp
+flask-cors
