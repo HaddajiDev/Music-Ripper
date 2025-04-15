@@ -1,4 +1,4 @@
-# YouTube to MP3 Converter Extension
+# Music Ripper
 
 A browser extension that allows you to easily download YouTube videos as MP3 files directly from your browser. The extension works with a local Flask server to handle the conversion process.
 
