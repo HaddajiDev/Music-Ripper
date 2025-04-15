@@ -2,8 +2,6 @@ import os
 import uuid
 import threading
 import time
-import json
-import tempfile
 from flask import Flask, request, send_file, render_template_string, jsonify
 from werkzeug.utils import secure_filename
 import yt_dlp
@@ -12,9 +10,6 @@ import re
 
 app = Flask(__name__)
 CORS(app)
-
-app.config['COOKIE_DIR'] = os.path.join(tempfile.gettempdir(), 'yt_cookies')
-os.makedirs(app.config['COOKIE_DIR'], exist_ok=True)
 
 downloads = {}
 
@@ -55,20 +50,6 @@ class DownloadProgressHook:
         elif d['status'] == 'finished':
             downloads[self.download_id]['progress'] = 'Processing audio...'
 
-@app.route('/upload-cookies', methods=['POST'])
-def upload_cookies():
-    try:
-        cookie_data = request.json.get('cookies')
-        if not cookie_data:
-            return jsonify(error="No cookie data provided"), 400
-            
-        cookie_path = os.path.join(app.config['COOKIE_DIR'], 'youtube_cookies.json')
-        with open(cookie_path, 'w') as f:
-            json.dump(cookie_data, f)
-            
-        return jsonify({'success': True, 'message': 'Cookies uploaded successfully'})
-    except Exception as e:
-        return jsonify({'error': f'Failed to upload cookies: {str(e)}'}), 500
 
 @app.route('/download-with-progress', methods=['POST'])
 def download_with_progress():
@@ -80,14 +61,7 @@ def download_with_progress():
     try:
         download_id = str(uuid.uuid4())
         
-        # Check if we have stored cookies
-        cookie_path = os.path.join(app.config['COOKIE_DIR'], 'youtube_cookies.json')
-        if os.path.exists(cookie_path):
-            ydl_opts = {'quiet': True, 'cookiefile': cookie_path}
-        else:
-            ydl_opts = {'quiet': True}
-            
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        with yt_dlp.YoutubeDL({'quiet': True}) as ydl:
             info_dict = ydl.extract_info(url, download=False)
             title = info_dict.get('title', 'video')
         
@@ -112,11 +86,7 @@ def download_with_progress():
         })
         
     except Exception as e:
-        error_msg = str(e)
-        # Check for YouTube authentication errors
-        if "sign in" in error_msg.lower() or "bot" in error_msg.lower():
-            error_msg = "YouTube requires authentication. Please use the 'Authenticate with YouTube' button in the extension."
-        return jsonify(error=f"Error processing video: {error_msg}"), 500
+        return jsonify(error=f"Error processing video: {str(e)}"), 500
 
 def process_download(download_id, url, filename):
     try:
@@ -138,16 +108,12 @@ def process_download(download_id, url, filename):
             'progress_hooks': [DownloadProgressHook(download_id)],
         }
         
-        cookie_path = os.path.join(app.config['COOKIE_DIR'], 'youtube_cookies.json')
-        if os.path.exists(cookie_path):
-            ydl_opts['cookiefile'] = cookie_path
-        
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
         
         downloads[download_id]['status'] = 'complete'
         downloads[download_id]['progress'] = 'Download complete!'
-        downloads[download_id]['download_url'] = f"https://music-ripper.onrender.com/get-file/{download_id}"
+        downloads[download_id]['download_url'] = f"http://localhost:5000/get-file/{download_id}"
         
         def cleanup_after_delay():
             time.sleep(600)

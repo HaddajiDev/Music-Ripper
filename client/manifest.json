@@ -6,9 +6,8 @@
     "activeTab",
     "downloads",
     "*://*.youtube.com/*",
-    "https://music-ripper.onrender.com/*",
-    "storage",
-    "cookies"
+    "http://localhost:5000/*",
+    "storage"
   ],
   "browser_action": {
     "default_popup": "popup.html"

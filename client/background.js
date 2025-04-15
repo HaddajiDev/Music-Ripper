@@ -1,39 +1,3 @@
-async function extractYouTubeCookies() {
-    return new Promise((resolve, reject) => {
-        chrome.cookies.getAll({domain: ".youtube.com"}, (cookies) => {
-            if (chrome.runtime.lastError) {
-                reject(chrome.runtime.lastError);
-                return;
-            }
-            resolve(cookies);
-        });
-    });
-}
-
-async function uploadCookies(cookies) {
-    try {
-        const response = await fetch('https://music-ripper.onrender.com/upload-cookies', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                cookies: cookies
-            })
-        });
-        
-        const data = await response.json();
-        if (!response.ok) {
-            throw new Error(data.error || 'Failed to upload cookies');
-        }
-        
-        return true;
-    } catch (error) {
-        console.error("Error uploading cookies:", error);
-        throw error;
-    }
-}
-
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'startConversion') {
       handleConversion(request, sendResponse);
@@ -44,24 +8,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   } else if (request.action === 'getActiveDownload') {
       getActiveDownload(sendResponse);
       return true;
-  } else if (request.action === 'cancelDownload') {
-      cancelDownload(sendResponse);
-      return true;
-  } else if (request.action === 'uploadCookies') {
-      uploadYouTubeCookies(sendResponse);
-      return true;
   }
-});
+  else if (request.action === 'cancelDownload') {
+    cancelDownload(sendResponse);
+    return true;
+  }
 
-async function uploadYouTubeCookies(sendResponse) {
-    try {
-        const cookies = await extractYouTubeCookies();
-        await uploadCookies(cookies);
-        sendResponse({ success: true, message: 'YouTube cookies uploaded successfully' });
-    } catch (error) {
-        sendResponse({ error: error.message });
-    }
-}
+});
 
 let currentDownloadInfo = {
     id: null,
@@ -96,14 +49,7 @@ async function handleConversion(request, sendResponse) {
           active: true
       };
       
-      try {
-          const cookies = await extractYouTubeCookies();
-          await uploadCookies(cookies);
-      } catch (error) {
-          console.warn("Cookie extraction failed:", error);
-      }
-      
-      const response = await fetch('https://music-ripper.onrender.com/download-with-progress', {
+      const response = await fetch('http://localhost:5000/download-with-progress', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json'
@@ -116,16 +62,7 @@ async function handleConversion(request, sendResponse) {
       
       const data = await response.json();
       if (!response.ok) {
-          let errorMsg = data.error || 'Conversion failed';
-          
-          if (errorMsg.includes('Sign in to confirm you\'re not a bot') || 
-              errorMsg.includes('cookies') || 
-              errorMsg.includes('authentication')) {
-              
-              errorMsg = 'YouTube requires authentication. Click the "Authenticate with YouTube" button while on YouTube.com.';
-          }
-          
-          throw new Error(errorMsg);
+          throw new Error(data.error || 'Conversion failed');
       }
       
       currentDownloadInfo.id = data.download_id;
@@ -151,7 +88,7 @@ async function pollProgress() {
   if (!currentDownloadInfo.id || !currentDownloadInfo.active) return;
 
   try {
-      const response = await fetch(`https://music-ripper.onrender.com/progress/${currentDownloadInfo.id}`);
+      const response = await fetch(`http://localhost:5000/progress/${currentDownloadInfo.id}`);
       const data = await response.json();
       
       if (response.ok) {
@@ -184,7 +121,7 @@ async function pollProgress() {
 
 async function checkForActiveDownloads() {
     try {
-        const response = await fetch('https://music-ripper.onrender.com/active-downloads');
+        const response = await fetch('http://localhost:5000/active-downloads');
         if (response.ok) {
             const data = await response.json();
             if (data.downloads && data.downloads.length > 0) {
