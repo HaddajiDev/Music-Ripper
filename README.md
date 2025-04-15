@@ -2,6 +2,12 @@
 
 A browser extension that allows you to easily download YouTube videos as MP3 files directly from your browser. The extension works with a local Flask server to handle the conversion process.
 
+<p align="center">
+  <img src="https://res.cloudinary.com/dqkvgv7mh/image/upload/v1744716294/wbpt7txc1spdbiienrzv.png" alt="ScreenShot 1" width="200"/>
+  <img src="https://res.cloudinary.com/dqkvgv7mh/image/upload/v1744716294/xzhxjmahngjgah8y342x.png" alt="ScreenShot 2" width="200"/>
+  <img src="https://res.cloudinary.com/dqkvgv7mh/image/upload/v1744716294/ythfgp4whlqlvsg72y1f.png" alt="ScreenShot 3" width="200"/>
+</p>
+
 ## Features
 
 - Convert YouTube videos to MP3 format with a single click
