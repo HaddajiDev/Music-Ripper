@@ -113,7 +113,7 @@ def process_download(download_id, url, filename):
         
         downloads[download_id]['status'] = 'complete'
         downloads[download_id]['progress'] = 'Download complete!'
-        downloads[download_id]['download_url'] = f"http://localhost:5000/get-file/{download_id}"
+        downloads[download_id]['download_url'] = f"https://music-ripper.onrender.com/get-file/{download_id}"
         
         def cleanup_after_delay():
             time.sleep(600)
@@ -181,7 +181,7 @@ def index():
     return render_template_string('''
         <!doctype html>
         <html>
-            <head><title>YouTube to MP3 Converter</title></head>
+            <head><title>Music Ripper</title></head>
             <body>
                 <h1>Use the Extension for conversions</h1>
             </body>
