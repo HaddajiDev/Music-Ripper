@@ -61,7 +61,11 @@ def download_with_progress():
     try:
         download_id = str(uuid.uuid4())
         
-        with yt_dlp.YoutubeDL({'quiet': True}) as ydl:
+        with yt_dlp.YoutubeDL({
+            'quiet': True,
+            'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            'referer': 'https://www.youtube.com/',
+        }) as ydl:
             info_dict = ydl.extract_info(url, download=False)
             title = info_dict.get('title', 'video')
         
@@ -106,6 +110,14 @@ def process_download(download_id, url, filename):
             }],
             'outtmpl': output_path,
             'progress_hooks': [DownloadProgressHook(download_id)],
+            'ignoreerrors': True,
+            'nocheckcertificate': True,
+            'geo_bypass': True,
+            'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            'referer': 'https://www.youtube.com/',
+            'retries': 10,
+            'socket_timeout': 30,
+            'force-ipv4': True,
         }
         
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
